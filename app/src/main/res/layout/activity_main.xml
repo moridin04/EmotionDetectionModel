@@ -1,31 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    android:gravity="center">
+    android:background="@drawable/bg_gradient">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:scaleType="fitCenter"
-        android:background="#DDD" />
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_gradient"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+        android:fontFamily="@font/poppins_regular"
+        app:title="IMAGE CLASSIFIER" />
 
-    <Button
-        android:id="@+id/btnSelect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Upload Image" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="24dp"
+        android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Prediction result"
-        android:paddingTop="20dp"
-        android:textSize="18sp" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
+            <!-- Original Image Container -->
+            <FrameLayout
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:layout_marginBottom="24dp"
+                android:elevation="4dp"
+                android:background="@drawable/image_frame_bg">
 
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Selected image for classification"
+                    tools:src="@tools:sample/avatars" />
+
+                <TextView
+                    android:id="@+id/placeholderText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No image selected"
+                    android:textColor="@android:color/darker_gray"
+                    android:layout_gravity="center"/>
+            </FrameLayout>
+
+            <!-- Grayscale Preview Container -->
+            <FrameLayout
+                android:layout_width="240dp"
+                android:layout_height="240dp"
+                android:layout_marginBottom="24dp"
+                android:elevation="4dp"
+                android:visibility="gone"
+                android:id="@+id/grayscaleContainer"
+                android:background="@drawable/image_frame_bg">
+
+                <ImageView
+                    android:id="@+id/grayscaleView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:contentDescription="Grayscale preview"/>
+            </FrameLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelect"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="32dp"
+                android:text="Select Image"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:fontFamily="@font/poppins_regular"
+                android:stateListAnimator="@animator/button_elevation"
+                app:iconTint="@android:color/white"
+                app:strokeColor="@android:color/white"
+                app:strokeWidth="1dp"/>
+
+            <!-- Result Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="#40000000"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="@font/poppins_regular"
+                        android:text="RESULTS"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/resultText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_regular"
+                        android:text="No prediction. Please add an image."
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
