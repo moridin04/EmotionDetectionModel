@@ -37,34 +37,31 @@ class MainActivity : AppCompatActivity() {
     ) { uri: Uri? ->
         uri?.let {
             try {
-                // Show loading dialog
                 progressDialog.show()
 
-                // Load the original image with sampling
+                val reqWidth = 48
+                val reqHeight = 48
+
                 val options = BitmapFactory.Options().apply {
-                    inSampleSize = calculateInSampleSize(it, 800, 800)
+                    inSampleSize = calculateInSampleSize(it, reqWidth, reqHeight)
+                    inJustDecodeBounds = false
                 }
-                val originalBitmap = MediaStore.Images.Media.getBitmap(contentResolver, it)
 
-                // Convert to grayscale
-                val grayscaleBitmap = convertToGrayscale(originalBitmap)
+                val inputStream = contentResolver.openInputStream(it)
+                val originalBitmap = BitmapFactory.decodeStream(inputStream, null, options)
+                inputStream?.close()
 
-                // Display original image
-                imageView.setImageBitmap(originalBitmap)
+                val croppedResized = centerCropAndResize(originalBitmap!!, 48)
+                val grayscaleBitmap = convertToGrayscale(croppedResized)
 
-                // Display grayscale preview (ADD THESE LINES)
-                findViewById<FrameLayout>(R.id.grayscaleContainer).visibility = View.VISIBLE
-                grayscaleView.setImageBitmap(grayscaleBitmap)
+                imageView.setImageBitmap(grayscaleBitmap)
 
-                // Hide placeholder text
                 findViewById<TextView>(R.id.placeholderText).visibility = View.GONE
 
-                // Run inference on grayscale image
                 val result = runInference(grayscaleBitmap)
                 resultText.text = "Prediction: $result"
 
             } catch (e: Exception) {
-                // Hide grayscale preview if error occurs (ADD THIS LINE)
                 findViewById<FrameLayout>(R.id.grayscaleContainer).visibility = View.GONE
                 Toast.makeText(this, "Error processing image", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
@@ -72,23 +69,33 @@ class MainActivity : AppCompatActivity() {
                 progressDialog.dismiss()
             }
         } ?: run {
-            // Hide grayscale preview if no image selected (ADD THIS LINE)
             findViewById<FrameLayout>(R.id.grayscaleContainer).visibility = View.GONE
         }
     }
+
+    private fun centerCropAndResize(bitmap: Bitmap, size: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val newEdge = minOf(width, height)
+        val xOffset = (width - newEdge) / 2
+        val yOffset = (height - newEdge) / 2
+
+        val croppedBitmap = Bitmap.createBitmap(bitmap, xOffset, yOffset, newEdge, newEdge)
+        return Bitmap.createScaledBitmap(croppedBitmap, size, size, true)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Initialize views
         imageView = findViewById(R.id.imageView)
         grayscaleView = findViewById(R.id.grayscaleView)
         val grayscaleContainer = findViewById<FrameLayout>(R.id.grayscaleContainer)
         resultText = findViewById(R.id.resultText)
         val btnSelect: Button = findViewById(R.id.btnSelect)
 
-        // Initialize progress dialog
         progressDialog = ProgressDialog(this).apply {
             setMessage("Processing image...")
             setCancelable(false)
@@ -96,7 +103,6 @@ class MainActivity : AppCompatActivity() {
 
         grayscaleContainer.visibility = View.GONE
 
-        // Initialize TensorFlow Lite
         tflite = Interpreter(loadModelFile("model4.tflite"))
 
         btnSelect.setOnClickListener {
@@ -113,7 +119,7 @@ class MainActivity : AppCompatActivity() {
         val paint = Paint()
 
         val colorMatrix = ColorMatrix().apply {
-            setSaturation(0f) // Convert to grayscale
+            setSaturation(0f)
         }
 
         paint.colorFilter = ColorMatrixColorFilter(colorMatrix)
@@ -163,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         for (x in 0 until 48) {
             for (y in 0 until 48) {
                 val pixel = resizedBitmap.getPixel(x, y)
-                val r = Color.red(pixel) // Grayscale so R=G=B
+                val r = Color.red(pixel)
                 input[0][y][x][0] = r / 255.0f
             }
         }

@@ -10,12 +10,12 @@ class ChoiceActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_choice)
 
-        // Button to Model Detection
+        // Model Detection
         findViewById<Button>(R.id.btnModel).setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
         }
 
-        // Button to Makers screen
+        // Developers screen
         findViewById<Button>(R.id.btnMakers).setOnClickListener {
             startActivity(Intent(this, MakersActivity::class.java))
         }

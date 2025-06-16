@@ -10,7 +10,7 @@ class MakersActivity : AppCompatActivity() {
         setContentView(R.layout.activity_makers)
 
         findViewById<Button>(R.id.btnBack).setOnClickListener {
-            finish() // Return to choice screen
+            finish()
         }
     }
 }
